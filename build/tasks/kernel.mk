@@ -369,6 +369,10 @@ define build-image-kernel-modules-lineage
     rm -rf $(4)
     mkdir -p $(4)/lib/modules/0.0/$(3)lib/modules$(6)
     cp $(1) $(4)/lib/modules/0.0/$(3)lib/modules$(6)
+    # Legacy 4.19 modules_install may omit these depmod inputs when only
+    # vendor modules are selected. Keep depmod from failing the image build.
+    touch $(4)/$(DEPMOD_STAGING_SUBDIR)/modules.order \
+          $(4)/$(DEPMOD_STAGING_SUBDIR)/modules.builtin
     $(DEPMOD) -b $(4) 0.0
     sed -e 's/\(.*modules.*\):/\/\1:/g' -e 's/ \([^ ]*modules[^ ]*\)/ \/\1/g' $(4)/lib/modules/0.0/modules.dep > $(2)/lib/modules$(6)/modules.dep
     cp $(4)/lib/modules/0.0/modules.softdep $(2)/lib/modules$(6)
