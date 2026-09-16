@@ -28,6 +28,11 @@ _build-manifest_xml := $(_build-manifest_intermediates)/$(LOCAL_MODULE)$(LOCAL_M
 
 $(_build-manifest_xml):
 	mkdir -p $(dir $@)
-	python3 .repo/repo/repo manifest -o - -r | grep -Ev "proprietary_$(MANIFEST_EXCLUDES)" > $@
+	# The Android build sandbox does not preserve the caller's XDG config.
+	# Give repo a writable, build-local Git config cache instead of letting it
+	# try to update the read-only host cache under ~/.repo_.gitconfig.json.
+	mkdir -p $(OUT_DIR)/.repo-xdg/git
+	touch $(OUT_DIR)/.repo-xdg/git/config
+	XDG_CONFIG_HOME=$(OUT_DIR)/.repo-xdg python3 .repo/repo/repo manifest -o - -r | grep -Ev "proprietary_$(MANIFEST_EXCLUDES)" > $@
 
 include $(BUILD_SYSTEM)/base_rules.mk
