@@ -12,6 +12,12 @@ ifeq ($(WITH_GMS),true)
                 $(call inherit-product-if-exists, vendor/partner_gms-tv/products/gms.mk)
             endif
             $(call inherit-product-if-exists, vendor/partner_gms-tv/products/mainline_modules.mk)
+        else ifneq (,$(wildcard vendor/gapps_tv/arm64/arm64-vendor.mk))
+            # MindTheGapps Android TV source uses its own vendor/gapps_tv
+            # layout and exposes an architecture-specific product makefile.
+            # Keep the standard partner_gms-tv path first so existing GMS
+            # providers retain precedence when both trees are present.
+            $(call inherit-product, vendor/gapps_tv/arm64/arm64-vendor.mk)
         endif
     # Special handling for Android Automotive
     else ifeq ($(PRODUCT_IS_AUTOMOTIVE),true)
